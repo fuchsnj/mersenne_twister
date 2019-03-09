@@ -1,7 +1,5 @@
 use std::num::Wrapping;
 
-const NAME: u64 = 123;
-
 const MAGIC: [Wrapping<u64>; 2] = [Wrapping(0), Wrapping(0xB5026F5AA96619E9)];
 const W: usize = 64;
 const N: usize = 312;
@@ -22,28 +20,27 @@ const DEFAULT_SEED: u64 = 5489;
 const UPPER_MASK: Wrapping<u64> = Wrapping(0xFFFFFFFF80000000);
 const LOWER_MASK: Wrapping<u64> = Wrapping(0x7FFFFFFF);
 
-
-pub struct Mersenne {
+pub struct MersenneTwister64 {
     state: [Wrapping<u64>; N],
     index: usize,
 
 }
 
-impl Mersenne {
-    fn new_unseeded() -> Mersenne {
-        Mersenne {
+impl MersenneTwister64 {
+    fn new_unseeded() -> MersenneTwister64 {
+        MersenneTwister64 {
             state: [Wrapping(0); N],
             index: N + 1,
         }
     }
-    pub fn new() -> Mersenne {
-        let mut output = Mersenne::new_unseeded();
+    pub fn new() -> MersenneTwister64 {
+        let mut output = MersenneTwister64::new_unseeded();
         output.seed(DEFAULT_SEED);
         output
     }
 
-    pub fn new_from_array_seed(seed: &[u64]) -> Mersenne {
-        let mut output = Mersenne::new_unseeded();
+    pub fn new_from_array_seed(seed: &[u64]) -> MersenneTwister64 {
+        let mut output = MersenneTwister64::new_unseeded();
         output.seed_by_array(seed);
         output
     }
@@ -114,11 +111,9 @@ impl Mersenne {
             self.state[index] = self.state[nindex as usize] ^ (y >> 1) ^ MAGIC[magic_idx];
         }
 
-
         let y = (self.state[N - 1] & UPPER_MASK) | (self.state[0] & LOWER_MASK);
         let magic_idx = (y.0 & 0x1) as usize;
         self.state[N - 1] = self.state[M - 1] ^ (y >> 1) ^ MAGIC[magic_idx];
-
 
         self.index = 0;
     }
@@ -126,12 +121,12 @@ impl Mersenne {
 
 #[cfg(test)]
 mod test {
-    use crate::Mersenne;
+    use crate::MersenneTwister64;
 
     #[test]
     fn test_array_seed() {
         // reference values from http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/mt19937-64.out.txt
-        let mut twister = Mersenne::new_from_array_seed(&[0x12345, 0x23456, 0x34567, 0x45678]);
+        let mut twister = MersenneTwister64::new_from_array_seed(&[0x12345, 0x23456, 0x34567, 0x45678]);
         assert_eq!(twister.next_u64(), 7266447313870364031);
         assert_eq!(twister.next_u64(), 4946485549665804864);
     }
@@ -139,7 +134,7 @@ mod test {
     #[test]
     fn test_default_seed() {
         // reference values from https://oeis.org/A221558
-        let mut twister = Mersenne::new();
+        let mut twister = MersenneTwister64::new();
         assert_eq!(twister.next_u64(), 14514284786278117030);
     }
 }
