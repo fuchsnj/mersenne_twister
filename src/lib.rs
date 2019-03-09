@@ -4,7 +4,6 @@ const MAGIC: [Wrapping<u64>; 2] = [Wrapping(0), Wrapping(0xB5026F5AA96619E9)];
 const W: usize = 64;
 const N: usize = 312;
 const M: usize = 156;
-const DIFF: isize = M as isize - N as isize;
 const U: usize = 29;
 const D: Wrapping<u64> = Wrapping(0x5555555555555555);
 const S: usize = 17;
@@ -105,7 +104,7 @@ impl MersenneTwister64 {
         for index in (N - M)..(N - 1) {
             let y = (self.state[index] & UPPER_MASK) | (self.state[index + 1] & LOWER_MASK);
             let magic_idx = (y.0 & 0x1) as usize;
-            let nindex = index as isize + DIFF;
+            let nindex = index - (N - M);
             self.state[index] = self.state[nindex as usize] ^ (y >> 1) ^ MAGIC[magic_idx];
         }
 
