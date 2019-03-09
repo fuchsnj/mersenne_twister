@@ -48,7 +48,7 @@ impl Mersenne {
         output
     }
 
-    pub fn seed(&mut self, seed: u64) {
+    fn seed(&mut self, seed: u64) {
         self.state[0] = Wrapping(seed);
 
         for i in 1..N {
@@ -58,7 +58,7 @@ impl Mersenne {
         self.index = N;
     }
 
-    pub fn seed_by_array(&mut self, seed: &[u64]) {
+    fn seed_by_array(&mut self, seed: &[u64]) {
         self.seed(19650218);
         let mut i = 1;
         let mut j = 0;
